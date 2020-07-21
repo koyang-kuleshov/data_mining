@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup as bs
 import requests
 import json
+from random import randint
 
 DOMAIN = 'https://geekbrains.ru'
 URL = 'https://geekbrains.ru/posts'
@@ -12,7 +13,6 @@ class GbBlogParse:
         self.posts_urls = set()
         self.pagination_urls = set()
         self.__done_urls = set()
-        self.__post_data = list()
 
     def get_page_soup(self, url):
         response = requests.get(url)
@@ -61,12 +61,13 @@ class GbBlogParse:
             tags = eggs.find_all(attrs={'class': 'small'})
             data['tags_urls'] = [f'{DOMAIN}{tag.get("href")}' for tag in tags
                                  if tag.get("href")]
-            self.__post_data.append(data)
-            print(self.__post_data)
+            self.save_to_file(data)
 
-    def save_to_file(self):
-        with open('result.json', 'w', encoding='UTF-8') as file_w:
-            json.dump(self.__post_data, file_w, ensure_ascii=False)
+    def save_to_file(self, data):
+        file_name = str(randint(10000, 9000000)) + '.json'
+        if data:
+            with open(file_name, 'w', encoding='UTF-8') as file_w:
+                json.dump(data, file_w, ensure_ascii=False)
 
 
 if __name__ == '__main__':
