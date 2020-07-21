@@ -73,4 +73,3 @@ class GbBlogParse:
 if __name__ == '__main__':
     parser = GbBlogParse()
     parser.run()
-    parser.save_to_file()
