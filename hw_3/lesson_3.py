@@ -1,16 +1,11 @@
-"""
-- images (список изображений в теле статьи)
-- text (текст статьи)
-"""
 from bs4 import BeautifulSoup as bs
 import requests
-import json
-from random import randint
 
 from pymongo import MongoClient
 
 DOMAIN = 'https://geekbrains.ru'
 URL = 'https://geekbrains.ru/posts'
+IGNORE = {'\n', ' '}
 
 
 class GbBlogParse:
@@ -70,11 +65,12 @@ class GbBlogParse:
             tags = eggs.find_all(attrs={'class': 'small'})
             data['tags_urls'] = [f'{DOMAIN}{tag.get("href")}' for tag in tags
                                  if tag.get("href")]
-            images = eggs.find_all(itemprop='articleBody')
-            data['images'] = [f'{image.img.get("src")}'
-                              for image in images if image.img.get("src")]
-            data['text'] = eggs.find(itemprop='articleBody').string
-
+            post = eggs.find(itemprop='articleBody')
+            data['images'] = [img['src'] for img in post.find_all('img')]
+            data['text'] = ''
+            for p in post:
+                if p.string and p.string != '\n' and p.string != ' ':
+                    data['text'] += p.string
             self.save_to_db(data)
 
     def save_to_db(self, data):
