@@ -5,7 +5,7 @@ from pymongo import MongoClient
 
 DOMAIN = 'https://geekbrains.ru'
 URL = 'https://geekbrains.ru/posts'
-IGNORE = {'\n', ' '}
+IGNORE = {'\n', '" "'}
 
 
 class GbBlogParse:
