@@ -19,9 +19,10 @@ class AvitoYelSpider(scrapy.Spider):
     selectors = {
         'pagination': '//div[contains(@data-marker, "pagination-button")]/span',
         'ads_url': '//h3[contains(@data-marker, "item-title")]/a/@href',
-        'ads_title': '//h1/span',
-        'ads_price': '//span[contains(@itemprop, "price")]',
-        'ads_params': '//ul.item-params-list/li'
+        'ads_title': '//h1/span/text()',
+        'ads_price': '//span[contains(@itemprop, "price")]/text()',
+        'ads_params_li': '//ul.item-params-list/li/text()',
+        'ads_params_span': '//ul.item-params-list/li/span/text()'
     }
 
     def __init__(self):
@@ -35,10 +36,17 @@ class AvitoYelSpider(scrapy.Spider):
         print('*' * 40)
 
         for url in response.xpath(self.selectors['ads_url']):
-            yield self.get_ads_params(url)
+            yield response.follow(url, callback=self.get_ads_params)
 
     def get_ads_params(self, response):
-        print(response.xpath(self.selectors['ads_title']))
+        # print(response.xpath(self.selectors['ads_title']).extract())
+        # print(response.xpath(self.selectors['ads_price']).extract_first())
+        print(response.xpath(self.selectors['ads_params_span']).extract())
+        # for param in response.xpath(self.selectors['ads_params_li']):
+            # li = param.extract()
+            # print(param)
+            # print(f'{li}', param.xpath('span/text()').extract())
+
         print('*' * 40)
 
     def save_to_db(self, data):
