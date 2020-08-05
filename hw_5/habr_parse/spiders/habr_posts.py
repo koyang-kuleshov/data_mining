@@ -25,13 +25,16 @@
 полученые айтемы необходимо сохранять в базе данных MONGO в отдельных коллекциях для статей, и авторов.
 """
 import scrapy
-from habr_parse.items import HabrParseItem
+from habr_parse.items import HabrParseItem, HabrAuthorItem
 
 
 class HabrPostsSpider(scrapy.Spider):
     name = 'habr_posts'
     allowed_domains = ['habr.com']
-    start_urls = ['http://habr.com/']
+    start_urls = ['http://habr.com/ru/top/']
+
+    nav_pages = '//ul[@id="nav-pagess"]/li/a/@href'
 
     def parse(self, response):
-        pass
+        for url in response.xpath(self.nav_pages):
+            print(url.extract())
