@@ -1,32 +1,7 @@
-"""
-Источник https://habr.com/
-****задача: Обойти ленту статей, зайти в каждую статью и извлеч следующие данные:
-
-заголовок
-сслыки на все изображения которые есть в статье
-количество комментариев
-информация о авторе ссылка и имя
-внимание необходимо использовать Item и ItemLoader
-
-стурктура item для поста следующая:
-- title
-- images
-- comments
-- autor_name
-- autor_url
-- post_url
-
-получив данные о авторе сохранить данные о авторе, и вам необходмо зайти на его
-страницу и обойти все его статьи.
-
-таким образом у вас будет item для авторов, структуру необходимо спроектировать
-вам, необходимо получить всю информацию в блоке ИНФОРМАЦИЯ, Имя, url, nicname и
-всю возможную контактную информацию
-полученые айтемы необходимо сохранять в базе данных MONGO в отдельных коллекциях для статей, и авторов.
-"""
 import scrapy
 from scrapy.loader import ItemLoader
 from habr_parse.items import HabrParseItem, HabrAuthorItem
+from habr_parse.spiders.author_info import AuthorInfoSpider
 
 
 class HabrPostsSpider(scrapy.Spider):
@@ -58,4 +33,5 @@ class HabrPostsSpider(scrapy.Spider):
             item.add_xpath(key, value)
         item.add_value('post_url', response.url)
 
+        yield AuthorInfoSpider(item.get_value('author_url'))
         yield item.load_item()

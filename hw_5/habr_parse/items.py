@@ -15,8 +15,6 @@ class HabrParseItem(scrapy.Item):
     images = scrapy.Field()
     comments = scrapy.Field(
         input_processor=MapCompose(clean_comment),
-        # input_processor=TakeFirst(),
-        # output_processor=MapCompose(str.strip)
         output_processor=TakeFirst()
         )
     author_name = scrapy.Field(output_processor=TakeFirst())
@@ -26,8 +24,8 @@ class HabrParseItem(scrapy.Item):
 
 class HabrAuthorItem(scrapy.Item):
     _id = scrapy.Field()
-    info = scrapy.Field()
-    name = scrapy.Field()
+    author_fullname = scrapy.Field(output_processor=TakeFirst())
+    author_nickname = scrapy.Field(output_processor=TakeFirst())
+    author_info = scrapy.Field()
+    author_contact = scrapy.Field()
     author_url = scrapy.Field()
-    nickname = scrapy.Field()
-    contact = scrapy.Field()
