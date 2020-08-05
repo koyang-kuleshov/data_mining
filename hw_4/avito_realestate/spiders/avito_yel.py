@@ -42,8 +42,6 @@ class AvitoYelSpider(scrapy.Spider):
                 continue
             else:
                 if page != 1:
-                    # self.pages.add(page)
-                    # print(self.pages)
                     for url in response.xpath(self.ads_url):
                         yield response.follow(url, callback=self.get_ads_params)
                     yield response.follow(f'{self.start_urls[0]}?p={page}',
