@@ -12,3 +12,8 @@ class HabrParsePipeline:
         self.collection = self.db[spider.name]
         self.collection.insert_one(item)
         return item
+
+    def save_to_mongodb(self, item, spider):
+        self.collection = self.db[spider.name]
+        self.collection.insert_one(item)
+        return item
