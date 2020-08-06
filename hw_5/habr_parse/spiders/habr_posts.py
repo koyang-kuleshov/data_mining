@@ -1,7 +1,6 @@
 import scrapy
 from scrapy.loader import ItemLoader
 from habr_parse.items import HabrParseItem, HabrAuthorItem
-from habr_parse.spiders.author_info import AuthorInfoSpider
 
 
 class HabrPostsSpider(scrapy.Spider):
@@ -32,6 +31,26 @@ class HabrPostsSpider(scrapy.Spider):
         for key, value in self.post_data.items():
             item.add_xpath(key, value)
         item.add_value('post_url', response.url)
+        # FIXIT:
+        yield response.follow(item.get_output_value('author_url'), callback=self.get_author_info)
+        yield item.load_item()
 
-        yield AuthorInfoSpider(item.get_value('author_url'))
+    def get_author_info(self, response):
+
+        selectors = {
+            'author_fullname': '//h1/a[contains(\
+                @class, "user-info__fullname")]/text()',
+            'author_nickname': '//h1/a[contains(\
+                @class, "user-info__nickname")]/text()',
+            'author_info': '//div[contains(@class, "profile-section__about-text")]\
+            //text()',
+            'author_contact': '//ul[contains(@class, "defination-list")]/li/span/\
+            text()',
+        }
+
+        item = ItemLoader(HabrAuthorItem, response)
+        for key, value in selectors.items():
+            item.add_xpath(key, value)
+        item.add_value('author_url', response.url)
+
         yield item.load_item()

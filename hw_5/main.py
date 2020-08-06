@@ -2,7 +2,7 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.crawler import Settings
 
 from habr_parse import settings
-from habr_parse.spiders.habr_posts import HabrPostsSpider, AuthorInfoSpider
+from habr_parse.spiders.habr_posts import HabrPostsSpider
 
 if __name__ == "__main__":
     crawler_settings = Settings()

@@ -17,7 +17,7 @@ from habr_parse.items import HabrAuthorItem
 class AuthorInfoSpider(scrapy.Spider):
     name = 'author_info'
     allowed_domains = ['habr.com']
-    start_urls = ['https://habr.com/ru/users/SLY_G/']
+    # start_urls = ['https://habr.com/ru/users/SLY_G/']
 
     selectors = {
         'author_fullname': '//h1/a[contains(\
@@ -30,12 +30,12 @@ class AuthorInfoSpider(scrapy.Spider):
         text()',
     }
 
-    # def __init__(self, start_url):
-    #     if start_url.find('//') > 0:
-    #         # self.start_url = [start_url]
-    #         self.start_urls = ['https://habr.com/ru/users/SLY_G/']
-    #     else:
-    #         self.start_urls = [f'https://habr.com/ru{start_url}']
+    def __init__(self, start_url):
+        if start_url.find('//') > 0:
+            # self.start_url = [start_url]
+            self.start_urls = ['https://habr.com/ru/users/SLY_G/']
+        else:
+            self.start_urls = [f'https://habr.com/ru{start_url}']
 
     def parse(self, response):
         item = ItemLoader(HabrAuthorItem, response)
