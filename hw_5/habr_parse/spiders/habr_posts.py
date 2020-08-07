@@ -16,7 +16,7 @@ class HabrPostsSpider(scrapy.Spider):
         'images': '//article//img/@src',
         'comments': '//h2/span[@id="comments_count"]/text()',
         'author_name': '//div[@class="user-info__links"]/a/text()',
-        'author_url': '//div[@class="user-info__links"]/a/@href',
+        'author_url': '//div[@class="user-info__links"]/a[contains(@class, "user-info__nickname")]/@href'
     }
 
     def parse(self, response):
@@ -30,25 +30,24 @@ class HabrPostsSpider(scrapy.Spider):
         item = ItemLoader(HabrParseItem(), response)
         for key, value in self.post_data.items():
             item.add_xpath(key, value)
+            if key == 'author_url':
+                url = response.xpath(value)[0]
+                yield response.follow(url, callback=self.get_author_info)
+
         item.add_value('post_url', response.url)
-        # FIXIT:
-        yield response.follow(item.get_output_value('author_url'), callback=self.get_author_info)
         yield item.load_item()
 
     def get_author_info(self, response):
-
         selectors = {
             'author_fullname': '//h1/a[contains(\
                 @class, "user-info__fullname")]/text()',
             'author_nickname': '//h1/a[contains(\
                 @class, "user-info__nickname")]/text()',
-            'author_info': '//div[contains(@class, "profile-section__about-text")]\
-            //text()',
-            'author_contact': '//ul[contains(@class, "defination-list")]/li/span/\
-            text()',
+            'author_info': '//div[contains(@class, "profile-section__about-text")]//text()',
+            'author_contact': '//ul[contains(@class, "defination-list")]/li/span//text()',
         }
 
-        item = ItemLoader(HabrAuthorItem, response)
+        item = ItemLoader(HabrAuthorItem(), response)
         for key, value in selectors.items():
             item.add_xpath(key, value)
         item.add_value('author_url', response.url)
