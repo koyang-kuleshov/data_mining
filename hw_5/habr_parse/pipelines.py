@@ -15,9 +15,6 @@ class HabrSaveToMongoDBPipeline:
         self.db = client['habr_parse']
 
     def process_item(self, item, spider):
-        if 'author_fullname' not in item.fields.keys():
-            self.collection = self.db[spider.name]
-        else:
-            self.collection = self.db['author_info']
+        self.collection = self.db[f'{type(item).__name__}s']
         self.collection.insert_one(item)
         return item

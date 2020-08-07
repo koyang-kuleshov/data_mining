@@ -8,14 +8,15 @@ def clean_comment(value):
         spam.append(el.strip())
     return spam
 
+
 def make_info_text(lst):
-    # spam = ''
-    # for el in lst:
-    #     print(el)
-    #     print(type(el))
-        # spam += f'{el} '
-    # spam = [el.rstrip().lstrip() for el in lst if el.strip() != ""]
     return lst.lstrip().rstrip()
+
+
+def clean_contact_list(value):
+    spam = value.lstrip().rstrip()
+    if spam:
+        return spam
 
 
 class HabrParseItem(scrapy.Item):
@@ -39,5 +40,8 @@ class HabrAuthorItem(scrapy.Item):
         input_processor=MapCompose(make_info_text),
         output_processor=Join()
     )
-    author_contact = scrapy.Field()
+    author_contact = scrapy.Field(
+        input_processor=MapCompose(clean_contact_list),
+        output_processor=Join()
+    )
     author_url = scrapy.Field(output_processor=TakeFirst())
