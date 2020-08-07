@@ -13,6 +13,7 @@ SPIDER_MODULES = ['habr_parse.spiders']
 NEWSPIDER_MODULE = 'habr_parse.spiders'
 LOG_ENABLED = True
 LOG_LEVEL = 'DEBUG'
+IMAGES_STORE = 'images'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'
@@ -65,7 +66,6 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'habr_parse.pipelines.HabrParsePipeline': 300,
-    'habr_parse.pipelines.HabrSaveToMongoDBPipeline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
