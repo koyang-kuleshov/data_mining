@@ -65,7 +65,6 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'habr_parse.pipelines.HabrParsePipeline': 300,
-    'habr_parse.pipelines.HabrSaveToMongoDBPipeline': 200,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

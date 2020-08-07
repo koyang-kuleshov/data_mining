@@ -52,4 +52,6 @@ class HabrPostsSpider(scrapy.Spider):
             item.add_xpath(key, value)
         item.add_value('author_url', response.url)
 
+        author_posts = f'{response.url}posts/'
+        yield response.follow(author_posts, callback=self.parse)
         yield item.load_item()
