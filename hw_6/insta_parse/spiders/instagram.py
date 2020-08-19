@@ -15,6 +15,7 @@ like_count - количество лайков поста
 так и путь куда сохранено фото
 """
 import scrapy
+import re
 
 
 class InstagramSpider(scrapy.Spider):
@@ -28,7 +29,32 @@ class InstagramSpider(scrapy.Spider):
         self.login = login
         self.passwd = passwd
         self.parse_users = parse_users
-        super.__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def parse(self, response):
-        pass
+        token = self.fetch_csrf_token(response.text)
+        yield scrapy.FormRequest(
+            self.__login_url,
+            method='POST',
+            callback=self.im_login,
+            formdata={
+                'username': self.login,
+                'enc_password': self.passwd,
+            },
+            headers={
+                'X-CSRFToken': token
+            }
+        )
+
+    def im_login(self, response):
+        data = response.json()
+        if data['authenticated']:
+            for user_name in self.parse_users:
+                yield response.follow(f'/{user_name}')
+                print(user_name)
+
+    def fetch_csrf_token(self, text):
+        matched = re.search('\"csrf_token\":\"\\w+\"', text).group()
+        token = matched.split(':').pop().replace(r'"', '')
+        print(token)
+        return token
