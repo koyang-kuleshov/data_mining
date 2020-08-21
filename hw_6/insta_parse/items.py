@@ -4,12 +4,13 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy.loader.processors import TakeFirst
 
 
 class InstaParseItem(scrapy.Item):
     _id = scrapy.Field()
-    user_name = scrapy.Field()
-    user_id = scrapy.Field()
+    user_name = scrapy.Field(output_processor=TakeFirst())
+    user_id = scrapy.Field(output_processor=TakeFirst())
     post_photos = scrapy.Field()
     post_pub_date = scrapy.Field()
     like_count = scrapy.Field()

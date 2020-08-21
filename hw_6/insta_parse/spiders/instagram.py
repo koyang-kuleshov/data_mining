@@ -15,14 +15,19 @@ like_count - количество лайков поста
 так и путь куда сохранено фото
 """
 import scrapy
+from scrapy.loader import ItemLoader
 import re
+import json
+
+
+from insta_parse.items import InstaParseItem
 
 
 class InstagramSpider(scrapy.Spider):
     name = 'instagram'
     allowed_domains = ['www.instagram.com']
     start_urls = ['https://www.instagram.com/']
-    __login_url = 'https://wwww.instagram.com/accounts/login/ajax/'
+    __login_url = 'https://www.instagram.com/accounts/login/ajax/'
 
     def __init__(self, login: str, passwd: str, parse_users: list,
                  *args, **kwargs):
@@ -50,11 +55,32 @@ class InstagramSpider(scrapy.Spider):
         data = response.json()
         if data['authenticated']:
             for user_name in self.parse_users:
-                yield response.follow(f'/{user_name}')
-                print(user_name)
+                yield response.follow(f'/{user_name}',
+                                      callback=self.get_user_data,
+                                      cb_kwargs={'user_name': user_name}
+                                      )
+
+    def get_user_data(self, response, user_name):
+        item = ItemLoader(InstaParseItem(), response)
+        item.add_value('user_name', user_name)
+        item.add_value('user_id', self.fetch_user_id(
+            response.text,
+            user_name
+            )
+        )
+        return item.load_item()
 
     def fetch_csrf_token(self, text):
         matched = re.search('\"csrf_token\":\"\\w+\"', text).group()
         token = matched.split(':').pop().replace(r'"', '')
-        print(token)
         return token
+
+    def fetch_user_id(self, text, username):
+        """Используя регулярные выражения парсит переданную строку на наличие
+        `id` нужного пользователя и возвращет его."""
+        pattern = r'{\"id\":\"\d+\",\"username\":\"' + username + '\"}'
+        matched = re.search(
+            pattern,
+            text
+        ).group()
+        return json.loads(matched).get('id')
