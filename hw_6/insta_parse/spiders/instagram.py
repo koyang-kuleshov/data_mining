@@ -94,13 +94,7 @@ class InstagramSpider(scrapy.Spider):
 
     def parse_user_posts(self, response, user_vars, user):
         item = ItemLoader(InstaParseItem(), response)
-        # post_pub_date - дата публикации поста -- data.taken_at_timestamp
-        # like_count -
-        # количество лайков поста -- data.edge_media_preview_like.count
-        user_id = self.fetch_user_id(
-                                 response.text,
-                                 user
-                                 )
+        spam = list()
 
         item.add_value('user_name', user)
         item.add_value('user_id', self.fetch_user_id(
@@ -113,12 +107,14 @@ class InstagramSpider(scrapy.Spider):
                       get('edge_owner_to_timeline_media').get('edges')
                       )
         for post in json_posts:
-            item.add_value('post_pub_date', post.get('node').
-                           get('taken_at_timestamp'))
-            item.add_value('like_count', post.get('node').
-                           get('edge_media_preview_like').
-                           get('count')
-                           )
+            spam.append({'post_pub_date': post.get('node').
+                        get('taken_at_timestamp'),
+                        'like_count': post.get('node').
+                         get('edge_media_preview_like').
+                         get('count')
+                         }
+                        )
+        item.add_value('user_posts', spam)
         return item.load_item()
 
     def fetch_csrf_token(self, text):
