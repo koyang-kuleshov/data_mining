@@ -10,6 +10,6 @@ if __name__ == "__main__":
     crawler_settings.setmodule(settings)
     crawler_proc = CrawlerProcess(settings=crawler_settings)
 
-    crawler_proc.crawl(InstagramSpider, login, passwd, ['nature.geography'])
+    crawler_proc.crawl(InstagramSpider, login, passwd, ['reaninja'])
 
     crawler_proc.start()

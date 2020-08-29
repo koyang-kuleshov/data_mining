@@ -95,12 +95,10 @@ class InstagramSpider(scrapy.Spider):
         item = ItemLoader(InstaParseItem(), response)
         spam = list()
 
+        user_id = self.fetch_user_id(response.text, user)
+
         item.add_value('user_name', user)
-        item.add_value('user_id', self.fetch_user_id(
-            response.text,
-            user
-            )
-        )
+        item.add_value('user_id', user_id)
         data = json.loads(response.body)
         json_posts = (data.get('data').get('user').
                       get('edge_owner_to_timeline_media').get('edges')
@@ -123,6 +121,19 @@ class InstagramSpider(scrapy.Spider):
                         get('edge_sidecar_to_children').get('edges')]
             spam[len(spam) - 1].update({'post_photos': eggs})
         item.add_value('user_posts', spam)
+        page_info = (data.get('data').get('user').
+                     get('edge_owner_to_timeline_media').get('page_info')
+                     )
+        # FIXIT
+        if page_info.get('has_next_page'):
+            user_vars = deepcopy(self.variables)
+            user_vars.update({'id': user_id})
+            user_vars["after"] = page_info.get('end_cursor')
+            yield response.follow(self.make_graphql_url(user_vars),
+                                  callback=self.parse_user_posts,
+                                  cb_kwargs={'user_vars': user_vars,
+                                             'user': user}
+                                  )
         return item.load_item()
 
     def fetch_csrf_token(self, text):
