@@ -14,6 +14,8 @@ NEWSPIDER_MODULE = 'insta_parse.spiders'
 LOG_ENABLED = True
 LOG_LEVEL = 'DEBUG'
 
+IMAGES_STORE = 'images'
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'
 
@@ -64,7 +66,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'insta_parse.pipelines.ImgPipeline': 200,
+    # 'insta_parse.pipelines.ImgPipeline': 200,
     'insta_parse.pipelines.InstaParsePipeline': 300,
 }
 

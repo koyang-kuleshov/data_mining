@@ -111,9 +111,12 @@ class InstagramSpider(scrapy.Spider):
                         get('taken_at_timestamp'),
                         'like_count': post.get('node').
                          get('edge_media_preview_like').
-                         get('count')
+                         get('count'),
                          }
                         )
+            eggs = [photo.get('src') for photo in post.get('node').
+                    get('display_resources')]
+            spam[len(spam) - 1].update({'post_photos': eggs})
         item.add_value('user_posts', spam)
         return item.load_item()
 

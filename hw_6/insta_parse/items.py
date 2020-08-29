@@ -12,6 +12,3 @@ class InstaParseItem(scrapy.Item):
     user_name = scrapy.Field(output_processor=TakeFirst())
     user_id = scrapy.Field(output_processor=TakeFirst())
     user_posts = scrapy.Field()
-    # post_photos = scrapy.Field()
-    # post_pub_date = scrapy.Field()
-    # like_count = scrapy.Field()

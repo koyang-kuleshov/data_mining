@@ -24,9 +24,8 @@ class InstaParsePipeline:
 
 class ImgPipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
-        pass
+        # for url in item.get()
         return item
 
     def item_completed(self, results, item, info):
-        pass
         return item
