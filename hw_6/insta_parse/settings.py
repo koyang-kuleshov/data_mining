@@ -66,7 +66,7 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    # 'insta_parse.pipelines.ImgPipeline': 200,
+    'insta_parse.pipelines.ImgPipeline': 200,
     'insta_parse.pipelines.InstaParsePipeline': 300,
 }
 

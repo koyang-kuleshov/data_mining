@@ -79,7 +79,6 @@ class InstagramSpider(scrapy.Spider):
             )
         )
         item.add_value(self.get_user_feed(response, user_name))
-        # self.get_user_feed(response, user_name)
         return item.load_item()
 
     def get_user_feed(self, response, user):
@@ -114,7 +113,7 @@ class InstagramSpider(scrapy.Spider):
                          get('count'),
                          }
                         )
-            eggs = [photo.get('src') for photo in post.get('node').
+            eggs = [{'src': photo.get('src')} for photo in post.get('node').
                     get('display_resources')]
             spam[len(spam) - 1].update({'post_photos': eggs})
         item.add_value('user_posts', spam)

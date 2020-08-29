@@ -23,9 +23,19 @@ class InstaParsePipeline:
 
 
 class ImgPipeline(ImagesPipeline):
+
     def get_media_requests(self, item, info):
-        # for url in item.get()
+        for post in item.get('user_posts'):
+            for url in post.get('post_photos', []):
+                try:
+                    yield Request(url.get('src'))
+                except ValueError as err:
+                    print(err)
         return item
 
     def item_completed(self, results, item, info):
+        for idx, post in enumerate(item.get('user_posts')):
+            for ph_idx, photo in enumerate(post):
+                item.get('user_posts')[idx].get('post_photos')[ph_idx].update(
+                    {'path': results[ph_idx][1].get('path')})
         return item
