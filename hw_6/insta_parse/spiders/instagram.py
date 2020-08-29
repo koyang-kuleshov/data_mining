@@ -113,8 +113,14 @@ class InstagramSpider(scrapy.Spider):
                          get('count'),
                          }
                         )
-            eggs = [{'src': photo.get('src')} for photo in post.get('node').
-                    get('display_resources')]
+            if (post.get('node').get('is_video') or
+                    not post.get('node').get('edge_sidecar_to_children')):
+                eggs = [{'src': post.get('node').get('display_resources')[2].
+                         get('src')}]
+            else:
+                eggs = [{'src': photo.get('node').get('display_resources')[2].
+                        get('src')} for photo in post.get('node').
+                        get('edge_sidecar_to_children').get('edges')]
             spam[len(spam) - 1].update({'post_photos': eggs})
         item.add_value('user_posts', spam)
         return item.load_item()

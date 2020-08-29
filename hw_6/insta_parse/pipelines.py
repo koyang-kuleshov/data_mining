@@ -34,8 +34,13 @@ class ImgPipeline(ImagesPipeline):
         return item
 
     def item_completed(self, results, item, info):
-        for idx, post in enumerate(item.get('user_posts')):
-            for ph_idx, photo in enumerate(post):
-                item.get('user_posts')[idx].get('post_photos')[ph_idx].update(
-                    {'path': results[ph_idx][1].get('path')})
+        result_idx = 0
+        for post_idx, post in enumerate(item.get('user_posts')):
+            for ph_idx, photo in enumerate(post.get('post_photos')):
+                item.get('user_posts')[post_idx].get('post_photos')[ph_idx].\
+                    update({
+                        'path': results[result_idx][1].get('path')
+                        }
+                    )
+                result_idx += 1
         return item
