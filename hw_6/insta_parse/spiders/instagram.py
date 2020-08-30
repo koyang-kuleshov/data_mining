@@ -92,25 +92,23 @@ class InstagramSpider(scrapy.Spider):
                               )
 
     def parse_user_posts(self, response, user_vars, user):
-        item = ItemLoader(InstaParseItem(), response)
-        spam = list()
 
         user_id = self.fetch_user_id(response.text, user)
 
-        item.add_value('user_name', user)
-        item.add_value('user_id', user_id)
         data = json.loads(response.body)
         json_posts = (data.get('data').get('user').
                       get('edge_owner_to_timeline_media').get('edges')
                       )
         for post in json_posts:
-            spam.append({'post_pub_date': post.get('node').
-                        get('taken_at_timestamp'),
-                        'like_count': post.get('node').
-                         get('edge_media_preview_like').
-                         get('count'),
-                         }
-                        )
+            item = ItemLoader(InstaParseItem(), response)
+            item.add_value('user_name', user)
+            item.add_value('user_id', user_id)
+            item.add_value('post_pub_date', post.get('node').
+                           get('taken_at_timestamp'))
+            item.add_value('like_count', post.get('node').
+                           get('edge_media_preview_like').
+                           get('count')
+                           )
             if (post.get('node').get('is_video') or
                     not post.get('node').get('edge_sidecar_to_children')):
                 eggs = [{'src': post.get('node').get('display_resources')[2].
@@ -119,8 +117,8 @@ class InstagramSpider(scrapy.Spider):
                 eggs = [{'src': photo.get('node').get('display_resources')[2].
                         get('src')} for photo in post.get('node').
                         get('edge_sidecar_to_children').get('edges')]
-            spam[len(spam) - 1].update({'post_photos': eggs})
-        item.add_value('user_posts', spam)
+            item.add_value('post_photos', eggs)
+            yield item.load_item()
         page_info = (data.get('data').get('user').
                      get('edge_owner_to_timeline_media').get('page_info')
                      )
@@ -133,7 +131,6 @@ class InstagramSpider(scrapy.Spider):
                                   cb_kwargs={'user_vars': user_vars,
                                              'user': user}
                                   )
-        yield item.load_item()
 
     def fetch_csrf_token(self, text):
         matched = re.search('\"csrf_token\":\"\\w+\"', text).group()
