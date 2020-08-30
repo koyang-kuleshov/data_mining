@@ -124,7 +124,6 @@ class InstagramSpider(scrapy.Spider):
         page_info = (data.get('data').get('user').
                      get('edge_owner_to_timeline_media').get('page_info')
                      )
-        # FIXIT
         if page_info.get('has_next_page'):
             user_vars = deepcopy(self.variables)
             user_vars.update({'id': user_id})
@@ -134,7 +133,7 @@ class InstagramSpider(scrapy.Spider):
                                   cb_kwargs={'user_vars': user_vars,
                                              'user': user}
                                   )
-        return item.load_item()
+        yield item.load_item()
 
     def fetch_csrf_token(self, text):
         matched = re.search('\"csrf_token\":\"\\w+\"', text).group()
