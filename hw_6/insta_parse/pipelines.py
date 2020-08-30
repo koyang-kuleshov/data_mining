@@ -5,7 +5,6 @@
 
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter
 from scrapy import Request
 from scrapy.pipelines.images import ImagesPipeline
 from pymongo import MongoClient
@@ -33,12 +32,10 @@ class ImgPipeline(ImagesPipeline):
         return item
 
     def item_completed(self, results, item, info):
-        # result_idx = 0
         for ph_idx, post in enumerate(item.get('post_photos')):
             item.get('post_photos')[ph_idx].update(
                 {
                     'path': results[ph_idx][1].get('path')
                 }
             )
-            # result_idx += 1
         return item
