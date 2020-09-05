@@ -28,16 +28,21 @@ class ZillowSpider(scrapy.Spider):
     def parse(self, response):
         real_estate = response.xpath('//a[@class="list-card-link"]/@href')
         for url in real_estate:
-            yield self.get_real_estate_data(response, url)
+            yield response.follow(
+                url,
+                callback=self.get_real_estate_data
+            )
         pages = response.xpath('//nav[@role="navigation"]/ul/li/a/@href')
         for page in pages:
             # yield response.follow(page, callback=self.parse)
-            print(page)
+            # print(page)
+            pass
 
-    def get_real_estate_data(self, response, url):
+    def get_real_estate_data(self, response):
         item = ItemLoader(ZillowspiderItem(), response)
+        item.add_value('url', response.url)
         item.add_xpath('address',
-                       '//h1[contains(@class, "ds-address-container")]/span/text()'
+                       '//head/title/text()'
                        )
-        item.add_xpath('price', '//h3[contains(@class, "ds-price")]/span/span/text()')
+        item.add_xpath('price', '//h3[contains(@class, "ds-price")]//span[@class="ds-value"]/text()')
         return item.load_item()
