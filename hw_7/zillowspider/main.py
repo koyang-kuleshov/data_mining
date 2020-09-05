@@ -2,14 +2,14 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.crawler import Settings
 
 from zillowspider import settings
-from insta_parse.spiders.config import login, passwd
-from insta_parse.spiders.instagram import InstagramSpider
+from zillowspider.spiders.config import region
+from zillowspider.spiders.zillow import ZillowSpider
 
 if __name__ == "__main__":
     crawler_settings = Settings()
     crawler_settings.setmodule(settings)
     crawler_proc = CrawlerProcess(settings=crawler_settings)
 
-    crawler_proc.crawl(InstagramSpider, login, passwd, ['reaninja'])
+    crawler_proc.crawl(ZillowSpider, region)
 
     crawler_proc.start()
