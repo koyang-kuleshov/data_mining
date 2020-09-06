@@ -1,4 +1,4 @@
-# Scrapy settings for habr_parse project
+# Scrapy settings for insta_parse project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -7,18 +7,20 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'habr_parse'
+BOT_NAME = 'insta_parse'
 
-SPIDER_MODULES = ['habr_parse.spiders']
-NEWSPIDER_MODULE = 'habr_parse.spiders'
+SPIDER_MODULES = ['insta_parse.spiders']
+NEWSPIDER_MODULE = 'insta_parse.spiders'
 LOG_ENABLED = True
 LOG_LEVEL = 'DEBUG'
+
+IMAGES_STORE = 'images'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 16
@@ -46,13 +48,13 @@ DEFAULT_REQUEST_HEADERS = {
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 #SPIDER_MIDDLEWARES = {
-#    'habr_parse.middlewares.HabrParseSpiderMiddleware': 543,
+#    'insta_parse.middlewares.InstaParseSpiderMiddleware': 543,
 #}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #DOWNLOADER_MIDDLEWARES = {
-#    'habr_parse.middlewares.HabrParseDownloaderMiddleware': 543,
+#    'insta_parse.middlewares.InstaParseDownloaderMiddleware': 543,
 #}
 
 # Enable or disable extensions
@@ -64,7 +66,8 @@ DEFAULT_REQUEST_HEADERS = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'habr_parse.pipelines.HabrParsePipeline': 300,
+    'insta_parse.pipelines.ImgPipeline': 200,
+    'insta_parse.pipelines.InstaParsePipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
