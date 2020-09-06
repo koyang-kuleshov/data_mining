@@ -56,10 +56,6 @@ class ZillowSpider(scrapy.Spider):
                                  /button/picture/source\
                                  [contains(@type, "image/jpeg")]'
                                  )
-        # https://photos.zillowstatic.com/cc_ft_192/ISblqr2zxeonkq1000000000.jpg 192w,
-        # https://photos.zillowstatic.com/cc_ft_384/ISblqr2zxeonkq1000000000.jpg 384w,
-        # https://photos.zillowstatic.com/cc_ft_576/ISblqr2zxeonkq1000000000.jpg 576w,
-        # https://photos.zillowstatic.com/cc_ft_768/ISblqr2zxeonkq1000000000.jpg 768w
         spam = list()
         for src in src_img:
             eggs = re.split(r'\, ', src.xpath('@srcset').get())[3]

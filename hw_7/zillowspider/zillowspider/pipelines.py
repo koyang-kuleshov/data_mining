@@ -24,18 +24,14 @@ class ZillowspiderPipeline:
 class ImgPipeline(ImagesPipeline):
 
     def get_media_requests(self, item, info):
-        for url in item.get('post_photos'):
+        for url in item.get('photos'):
             try:
-                yield Request(url.get('src'))
+                yield Request(url)
             except ValueError as err:
                 print(err)
         return item
 
     def item_completed(self, results, item, info):
-        for ph_idx, post in enumerate(item.get('post_photos')):
-            item.get('post_photos')[ph_idx].update(
-                {
-                    'path': results[ph_idx][1].get('path')
-                }
-            )
+        if results:
+            item['photos'] = [itm[1] for itm in results if itm[0]]
         return item
