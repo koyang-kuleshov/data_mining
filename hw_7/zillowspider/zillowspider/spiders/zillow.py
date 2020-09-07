@@ -11,9 +11,13 @@ photos - все фотографии из объявления в максима
 """
 
 import re
+from time import sleep
 
 import scrapy
 from scrapy.loader import ItemLoader
+
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 from zillowspider.items import ZillowspiderItem
 
@@ -23,6 +27,10 @@ class ZillowSpider(scrapy.Spider):
     name = 'zillow'
     allowed_domains = ['www.zillow.com']
     start_urls = ['https://www.zillow.com/']
+
+    driver = webdriver.Firefox(
+        executable_path='/usr/bin/geckodriver',
+        firefox_binary='/usr/bin/firefox')
 
     def __init__(self, region: str, *args, **kwargs):
         self.start_urls = [f'{self.start_urls[0]}{region}/']
@@ -41,8 +49,7 @@ class ZillowSpider(scrapy.Spider):
             # yield response.follow(page, callback=self.parse)
             print(page)
 
-    @staticmethod
-    def get_real_estate_data(response):
+    def get_real_estate_data(self, response):
         """Method for parsing real estate data card"""
         item = ItemLoader(ZillowspiderItem(), response)
         item.add_value('url', response.url)
@@ -51,11 +58,36 @@ class ZillowSpider(scrapy.Spider):
                        )
         item.add_xpath('price',
                        '//h3[contains(@class, "ds-price")]//span[@class="ds-value"]/text()')
-        li_img = response.xpath('//ul[contains(@class, "media-stream")]/li')
-        src_img = response.xpath('//ul[contains(@class, "media-stream")]/li\
-                                 /button/picture/source\
-                                 [contains(@type, "image/jpeg")]'
-                                 )
+        # li_img = response.xpath('//ul[contains(@class, "media-stream")]/li')
+        # src_img = response.xpath('//ul[contains(@class, "media-stream")]/li\
+        #                          /button/picture/source\
+        #                          [contains(@type, "image/jpeg")]'
+        #                          )
+        self.driver.get(response.url)
+        src_img = self.driver.find_elements_by_xpath(
+            '//ul[contains(@class, "media-stream")]/li\
+            /button/picture/source\
+            [contains(@type, "image/jpeg")]')
+        media_col = self.driver.find_element_by_xpath('//ul[contains(@class,\
+                                                     "ds-media-col")]')
+        while True:
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            media_col.send_keys(Keys.PAGE_DONW)
+            sleep(2)
+            len_tmp = self.driver.find_elements_by_xpath(
+                '//ul[contains(@class, "media-stream")]/li\
+                /button/picture/source\
+                [contains(@type, "image/jpeg")]'
+            )
+            if len(src_img) == len(len_tmp):
+                break
+            src_img = len_tmp
+
         spam = list()
         for src in src_img:
             eggs = re.split(r'\, ', src.xpath('@srcset').get())[3]
