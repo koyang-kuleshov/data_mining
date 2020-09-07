@@ -10,7 +10,6 @@ photos - все фотографии из объявления в максима
 ( необходимо скачать и сохранить на компьютере)
 """
 
-import re
 from time import sleep
 
 import scrapy
@@ -46,8 +45,7 @@ class ZillowSpider(scrapy.Spider):
             )
         pages = response.xpath('//nav[@role="navigation"]/ul/li/a/@href')
         for page in pages:
-            # yield response.follow(page, callback=self.parse)
-            print(page)
+            yield response.follow(page, callback=self.parse)
 
     def get_real_estate_data(self, response):
         """Method for parsing real estate data card"""
@@ -57,28 +55,27 @@ class ZillowSpider(scrapy.Spider):
                        '//head/title/text()'
                        )
         item.add_xpath('price',
-                       '//h3[contains(@class, "ds-price")]//span[@class="ds-value"]/text()')
-        # li_img = response.xpath('//ul[contains(@class, "media-stream")]/li')
-        # src_img = response.xpath('//ul[contains(@class, "media-stream")]/li\
-        #                          /button/picture/source\
-        #                          [contains(@type, "image/jpeg")]'
-        #                          )
+                       ('//h3[contains(@class, "ds-price")]'
+                        '//span[@class="ds-value"]/text()')
+                       )
         self.driver.get(response.url)
+        sleep(10)
         src_img = self.driver.find_elements_by_xpath(
-            '//ul[contains(@class, "media-stream")]/li\
-            /button/picture/source\
-            [contains(@type, "image/jpeg")]')
-        media_col = self.driver.find_element_by_xpath('//ul[contains(@class,\
-                                                     "ds-media-col")]')
+            '//ul[contains(@class, "media-stream")]/li'
+            '/button/picture/source[contains(@type, "image/jpeg")]'
+        )
+        media_col = self.driver.find_element_by_xpath(
+            '//div[contains(@class, "ds-media-col")]'
+        )
         while True:
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            media_col.send_keys(Keys.PAGE_DONW)
-            sleep(2)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            media_col.send_keys(Keys.PAGE_DOWN)
+            sleep(10)
             len_tmp = self.driver.find_elements_by_xpath(
                 '//ul[contains(@class, "media-stream")]/li\
                 /button/picture/source\
@@ -87,10 +84,11 @@ class ZillowSpider(scrapy.Spider):
             if len(src_img) == len(len_tmp):
                 break
             src_img = len_tmp
-
-        spam = list()
-        for src in src_img:
-            eggs = re.split(r'\, ', src.xpath('@srcset').get())[3]
-            spam.append(re.split(r' ', eggs)[0])
+        spam = [itm.get_attribute('srcset').split(' ')[-2] for itm in
+                self.driver.find_elements_by_xpath(
+                '//ul[contains(@class, "media-stream")]'
+                '/li/button/picture/source[contains(@type, "image/jpeg")]'
+                )
+                ]
         item.add_value('photos', spam)
         return item.load_item()
